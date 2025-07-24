@@ -2,6 +2,7 @@
 #include <ctype.h>
 #define getchar_unlocked getchar
 #define putchar_unlocked putchar
+//↑ for POJ
 void read(int* w) {
 	int f = 1, x = 0;
 	char s = getchar_unlocked();

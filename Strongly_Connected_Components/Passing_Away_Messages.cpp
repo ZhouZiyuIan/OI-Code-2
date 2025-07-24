@@ -1,7 +1,10 @@
+#pragma GCC optimize(3, "Ofast", "inline")
 #include <stdio.h>
 #include <ctype.h>
-#define getchar_unlocked getchar
-#define putchar_unlocked putchar
+#ifdef _WIN64
+#define getchar_unlocked() _getchar_nolock()
+#define putchar_unlocked(_c) _putchar_nolock(_c)
+#endif
 void read(int* w) {
 	int f = 1, x = 0;
 	char s = getchar_unlocked();
@@ -29,7 +32,7 @@ int max(int a, int b) {
 int min(int a, int b) {
 	return a < b ? a : b;
 }
-int n, m, a, b, to[200001], nxt[200001], head[200001], dfn[200001], time, low[200001], top, cnt, stk[200001], vis[200001], mar[200001], du[200001], z, flag = 1, out[200001], in[200001], o0, i0;
+int n, m, a, b, to[500001], nxt[500001], head[500001], dfn[500001], time, low[500001], top, cnt, stk[500001], vis[500001], mar[500001], du[500001], z, flag = 1, in[500001], i0;
 void add(int x, int y){
 	to[++z] = y;
 	nxt[z] = head[x];
@@ -66,16 +69,22 @@ void tarjan(int now) {
 
 int main() {
 	read(&n);
-	for (int i = 1; i <= n; i++) {
-		while (read(&b), b) {
-			add(i, b);
+	for (int i = 1; i <= n; ++i) {
+		for (int j = 1; j <= n; ++j) {
+			read(&b);
+			if (b) {
+				add(i, j);
+			}
 		}
 	}
-	for (int i = 1; i <= n; i++)if (!dfn[i])tarjan(i);
+	for (int i = 1; i <= n; ++i) {
+		if (!dfn[i]) {
+			tarjan(i);
+		}
+	}
 	for (int i = 1; i <= n; ++i) {
 		for (int j = head[i]; j; j = nxt[j]) {
 			if (mar[i] != mar[to[j]]) {
-				++out[mar[i]];
 				++in[mar[to[j]]];
 			}
 		}
@@ -85,16 +94,7 @@ int main() {
 			if (!in[i]) {
 				++i0;
 			}
-			if (!out[i]) {
-				++o0;
-			}
 		}
 	}
 	write(i0);
-	putchar_unlocked('\n');
-	write(flag ? max(i0, o0) : 0);
 }
-/*
- *天啊，什么千年前黑历史翻新
- *使用了本人 2024-12-07 的代码（大概？）改编而来
- */
