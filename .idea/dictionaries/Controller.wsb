@@ -1,0 +1,19 @@
+<Configuration>
+<MappedFolders>
+<MappedFolder>
+<HostFolder>D:\Genshin Impact game</HostFolder>
+<SandboxFolder>C:\YS</SandboxFolder>
+<ReadOnly>false</ReadOnly>
+</MappedFolder>
+<MappedFolder>
+<HostFolder>D:\Star Rail game</HostFolder>
+<SandboxFolder>C:\SR</SandboxFolder>
+<ReadOnly>false</ReadOnly>
+</MappedFolder>
+<MappedFolder>
+<HostFolder>D:\Mojang game</HostFolder>
+<SandboxFolder>C:\MC</SandboxFolder>
+<ReadOnly>false</ReadOnly>
+</MappedFolder>
+</MappedFolders>
+</Configuration>

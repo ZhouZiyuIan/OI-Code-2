@@ -1,0 +1,1 @@
+{"name":"Luogu - P5307","url":"https://www.luogu.com.cn/problem/P5307","memoryLimit":512000,"timeLimit":6000,"tests":[{"input":"2 3 200\n2 3 4\n5 6 7","output":"2","id":1751860712739},{"id":1751860712740,"input":"3 3 90\n2 1 1\n45 1 1\n1 1 1","output":"3"}],"group":"luogu","srcPath":"c:\\Users\\118\\Desktop\\OI Code(New)\\Luogu_P_5307.c"}
