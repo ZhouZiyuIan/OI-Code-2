@@ -1,78 +1,53 @@
-#include<bits/stdc++.h>
+#include<iostream>
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
 using namespace std;
-#define il inline
-#define re register
-#define inf 123456789
-il int read()
-{
-    re int x = 0, f = 1; re char c = getchar();
-    while(c < '0' || c > '9') { if(c == '-') f = -1; c = getchar();}
-    while(c >= '0' && c <= '9') x = x * 10 + c - 48, c = getchar();
-    return x * f;
-}
-#define rep(i, s, t) for(re int i = s; i <= t; ++ i)
-#define drep(i, s, t) for(re int i = t; i >= s; -- i)
-#define Next(i, u) for(re int i = head[u]; i; i = e[i].next)
-#define mem(k, p) memset(k, p, sizeof(k))
-#define maxn 1200005
-struct edge{int v, w, next;}e[maxn << 1];
-int n, m, head[maxn], cnt, k, ans;
-int dp[maxn], vis[maxn], sum, dis[maxn], rt, size[maxn], rev[maxn], tot;
-il void add(int u, int v, int w)
-{
-    e[++ cnt] = (edge){v, w, head[u]}, head[u] = cnt;
-    e[++ cnt] = (edge){u, w, head[v]}, head[v] = cnt;
-}
-il void getrt(int u, int fr)
-{
-    size[u] = 1, dp[u] = 0;
-    Next(i, u)
-    {
-        int v = e[i].v;
-        if(v == fr || vis[v]) continue;
-        getrt(v, u);
-        size[u] += size[v], dp[u] = max(dp[u], size[v]);
-    }
-    dp[u] = max(dp[u], sum - size[u]);
-    if(dp[u] < dp[rt]) rt = u;
-}
-il void getdis(int u, int fr)
-{
-    rev[++ tot] = dis[u];
-    Next(i, u)
-    {
-        int v = e[i].v;
-        if(v == fr || vis[v]) continue;
-        dis[v] = dis[u] + e[i].w;
-        getdis(v, u);
-    }
-}
-il int doit(int u, int w)
-{
-    tot = 0, dis[u] = w, getdis(u, 0);
-    sort(rev + 1, rev + tot + 1);
-    int l = 1, r = tot, ans = 0;
-    while(l <= r) (rev[l] + rev[r] <= k) ? (ans += r - l, ++ l) : (-- r);
-    return ans;
-}
-il void solve(int u)
-{
-    vis[u] = 1, ans += doit(u, 0);
-    Next(i, u)
-    {
-        int v = e[i].v;
-        if(vis[v]) continue;
-        ans -= doit(v, e[i].w);
-        sum = size[v], dp[0] = n, rt = 0;
-        getrt(v, u), solve(rt);
-    }
-}
-int main()
-{
-    n = read();
-    k = read();
-    rep(i, 1, n - 1){int u = read(), v = read(), w = read(); add(u, v, w);}
-    dp[0] = sum = n, getrt(1, 0), solve(rt);
-    printf("%d", ans);
-    return 0;
+const int N=205;
+int head[N*N*2],to[N*N*8],nxt[N*N*8],cnt=1,n,ans,tot=0;
+int vis[N*N*2],cp[N*N*2];
+int fx[9]={0,-1,-2,1,2,-1,-2,1,2};
+int fy[9]={0,-2,-1,-2,-1,2,1,2,1};//控制方向数组。 
+char s[N][N];
+void add(int u,int v){
+	to[cnt]=v;
+	nxt[cnt]=head[u];
+	head[u]=cnt++;
+} 
+bool dfs(int x){
+	for(int i=head[x];i;i=nxt[i]){
+		int v=to[i];
+		if(vis[v]) continue;
+		vis[v]=true;
+		if(!cp[v]||dfs(cp[v])){
+		    cp[v]=x;
+	    	return true;
+		}
+	}
+	return false;
+}//匈牙利算法板子 
+int main(){
+	cin>>n;
+	for(int i=1;i<=n;i++) cin>>s[i]+1;
+	for(int i=1;i<=n;i++){
+		for(int j=1;j<=n;j++){
+			if(s[i][j]=='1'){
+			    tot++;
+			    continue;
+			}//记录不能放马的点的个数。 
+			for(int k=1;k<=8;k++){
+				int x=i+fx[k],y=j+fy[k];
+				if(s[x][y]=='1') continue; 
+				if(x>=1&&x<=n&&y>=1&&y<=n&&(i+j)%2==0) add((i-1)*n+j,(x-1)*n+y+n*n);
+				//在可以相互攻击的点之间连边。 
+			} 
+		}
+	}
+	for(int i=1;i<=n*n;i++){
+		memset(vis,0,sizeof(vis));
+		int k=dfs(i);
+		ans+=k;//统计最大匹配数。 
+	}
+	printf("%d\n",n*n-tot-ans);//输出最大独立点集=总点数-最大匹配数。 
+	return 0;
 }
