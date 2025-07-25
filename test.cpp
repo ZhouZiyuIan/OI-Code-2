@@ -1,53 +1,51 @@
 #include<iostream>
 #include<cstdio>
 #include<cstring>
-#include<algorithm>
+#include<queue>
+#define ll long long
 using namespace std;
-const int N=205;
-int head[N*N*2],to[N*N*8],nxt[N*N*8],cnt=1,n,ans,tot=0;
-int vis[N*N*2],cp[N*N*2];
-int fx[9]={0,-1,-2,1,2,-1,-2,1,2};
-int fy[9]={0,-2,-1,-2,-1,2,1,2,1};//控制方向数组。 
-char s[N][N];
+const int N=1e5+5;
+int n,n1,tot,nd[N],cnt;
+int x1[N],x2[N],y1[N],y2[N],bk[N],a[N],cp[N];
+struct edge{
+	int v,nxt;
+}ed[N];
 void add(int u,int v){
-	to[cnt]=v;
-	nxt[cnt]=head[u];
-	head[u]=cnt++;
-} 
-bool dfs(int x){
-	for(int i=head[x];i;i=nxt[i]){
-		int v=to[i];
-		if(vis[v]) continue;
-		vis[v]=true;
-		if(!cp[v]||dfs(cp[v])){
-		    cp[v]=x;
-	    	return true;
-		}
+	ed[++tot]={v,nd[u]};
+	nd[u]=tot;
+}
+int hung(int u){//匈牙利算法
+	bk[u]=1;
+	for(int i=nd[u];i;i=ed[i].nxt){
+		int v=ed[i].v;
+		if(bk[cp[v]])continue;
+		if(cp[v]==0||hung(cp[v]))return cp[v]=u;//相当于return true
 	}
-	return false;
-}//匈牙利算法板子 
+	return 0;
+}
 int main(){
 	cin>>n;
-	for(int i=1;i<=n;i++) cin>>s[i]+1;
 	for(int i=1;i<=n;i++){
-		for(int j=1;j<=n;j++){
-			if(s[i][j]=='1'){
-			    tot++;
-			    continue;
-			}//记录不能放马的点的个数。 
-			for(int k=1;k<=8;k++){
-				int x=i+fx[k],y=j+fy[k];
-				if(s[x][y]=='1') continue; 
-				if(x>=1&&x<=n&&y>=1&&y<=n&&(i+j)%2==0) add((i-1)*n+j,(x-1)*n+y+n*n);
-				//在可以相互攻击的点之间连边。 
-			} 
+		cin>>x1[i]>>y1[i]>>x2[i]>>y2[i];
+		if(x1[i]>x2[i])swap(x1[i],x2[i]);//不一定x1<=x2,y1<=y2
+		if(y1[i]>y2[i])swap(y1[i],y2[i]);
+		if(x1[i]==x2[i])a[i]=1,n1++;//竖
+		else a[i]=2;//横
+	}
+	for(int i=1;i<n;i++)//有交点就建边
+		for(int j=i+1;j<=n;j++){
+			if(a[i]==1&&a[j]==2)
+				if(x1[i]>=x1[j]&&x2[i]<=x2[j]&&y1[j]>=y1[i]&&y2[j]<=y2[i])
+					add(i,j+n1),cout<<"1:"<<i<<"->"<<j+n1<<endl;
+			if(a[i]==2&&a[j]==1)
+				if(x1[j]>=x1[i]&&x2[j]<=x2[i]&&y1[i]>=y1[j]&&y2[i]<=y2[j])
+					add(j,i+n1),cout<<"2:"<<j<<"->"<<i+n1<<endl;
 		}
+	for(int i=1;i<=n;i++){
+		if(a[i]==2)continue;
+		memset(bk,0,sizeof(bk));
+		if(hung(i))cnt++;
 	}
-	for(int i=1;i<=n*n;i++){
-		memset(vis,0,sizeof(vis));
-		int k=dfs(i);
-		ans+=k;//统计最大匹配数。 
-	}
-	printf("%d\n",n*n-tot-ans);//输出最大独立点集=总点数-最大匹配数。 
+	cout<<n1<<endl;
 	return 0;
 }
