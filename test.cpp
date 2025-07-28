@@ -1,60 +1,59 @@
-#include <bits/stdc++.h>
-using namespace std;
+#include <stdio.h>
+
+#define MAXN 500005
+#define MOD 1000000000
+
+typedef long long ll;
+
+int a[MAXN];
+int n;
+
+// 单调栈（下标栈）
+int min_stk[MAXN], max_stk[MAXN];
+int min_top = 0, max_top = 0;
+
+ll result = 0;
+
+int min_pos[MAXN], max_pos[MAXN];
 
 int main() {
-	ios::sync_with_stdio(false);
-	cin.tie(nullptr);
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++) scanf("%d", &a[i]);
 
-	int r, c, m;
-	cin >> r >> c >> m;
+    int l = 0;
+    min_top = max_top = 0;
 
-	struct Event { int t, x, y; };
-	vector<Event> ev;
-	ev.reserve(m + 1);
+    for (int r = 0; r < n; r++) {
+        // 更新 min 栈
+        while (min_top > 0 && a[min_stk[min_top - 1]] >= a[r]) min_top--;
+        min_pos[r] = min_top == 0 ? 0 : min_stk[min_top - 1] + 1;
+        min_stk[min_top++] = r;
 
-	// Sentinel start position at time 0
-	ev.push_back({0, 1, 1});
-	for (int i = 0; i < m; i++) {
-		int t, x, y;
-		cin >> t >> x >> y;
-		ev.push_back({t, x, y});
-	}
+        // 更新 max 栈
+        while (max_top > 0 && a[max_stk[max_top - 1]] <= a[r]) max_top--;
+        max_pos[r] = max_top == 0 ? 0 : max_stk[max_top - 1] + 1;
+        max_stk[max_top++] = r;
 
-	// Sort all events by time
-	sort(ev.begin(), ev.end(),
-		 [](const Event &a, const Event &b) { return a.t < b.t; });
+        int left = l;
+        if (min_pos[r] > left) left = min_pos[r];
+        if (max_pos[r] > left) left = max_pos[r];
 
-	int n = ev.size();
-	vector<int> dp(n, -1000000000);
+        // 枚举合法 l ∈ [left, r]
+        for (int i = r; i >= left; i--) {
+            int len = r - i + 1;
 
-	dp[0] = 0;
-	int best_old = -1000000000;
-	int ptr = 0;
-	int answer = 0;
-	int maxDist = r + c - 2;
+            // 找区间 [i..r] 的 min/max
+            int minv = a[i], maxv = a[i];
+            for (int j = i + 1; j <= r; j++) {
+                if (a[j] < minv) minv = a[j];
+                if (a[j] > maxv) maxv = a[j];
+            }
 
-	for (int i = 1; i < n; i++) {
-		// Move ptr forward for events too old: they can reach anywhere
-		while (ptr < i && ev[i].t - ev[ptr].t > maxDist) {
-			best_old = max(best_old, dp[ptr]);
-			ptr++;
-		}
+            ll term = 1LL * len * minv % MOD * maxv % MOD;
+            result = (result + term) % MOD;
+        }
+    }
 
-		// Option 1: come from any old event
-		dp[i] = best_old + 1;
-
-		// Option 2: check events in the recent time window
-		for (int j = ptr; j < i; j++) {
-			int dt = ev[i].t - ev[j].t;
-			int dist = abs(ev[i].x - ev[j].x) + abs(ev[i].y - ev[j].y);
-			if (dist <= dt) {
-				dp[i] = max(dp[i], dp[j] + 1);
-			}
-		}
-
-		answer = max(answer, dp[i]);
-	}
-
-	cout << answer << "\n";
-	return 0;
+    printf("%lld\n", result);
+    return 0;
 }
