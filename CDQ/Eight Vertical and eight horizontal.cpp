@@ -44,8 +44,16 @@ typedef struct {
 	bitset<1001> val;
 } node;
 node edg[1001];
+inline void readStr(char *str) {
+	char c;
+	while ((c = getchar_unlocked()) <= 32);
+	do {
+		*str++ = c;
+	} while ((c = getchar_unlocked()) > 32);
+	*str = '\0';
+}
 bitset<1001> read_bs() {
-	scanf("%s", s);
+	readStr(s);
 	bitset<1001> bs(s);
 	return bs;
 }
@@ -119,7 +127,7 @@ int main() {
 	dfs(1);
 	que(0);
 	for (int i = 1; i <= Q; ++i) {
-		scanf("%s", s);
+		readStr(s);
 		read(&x);
 		if (s[1] == 'd') {
 			read(&y);
