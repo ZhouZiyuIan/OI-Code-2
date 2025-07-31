@@ -1,23 +1,33 @@
 #include <stdio.h>
-const int MOD = 998244353;
-long long n, T, k, f[5000001], fac[5000001], powb2[5000001], Inv[5000001], Ifac[5000001];
+#include <ctype.h>
+#ifdef _WIN64
+#define putchar_unlocked _putchar_nolock
+#endif
+#define rd read()
+#define gc pa == pb && (pb = (pa = buf) + fread(buf, 1, 100000, stdin), pa == pb) ? EOF : *pa++
+static char buf[100000], *pa(buf), *pb(buf);
+void read(int *w) {
+	int x = 0, s = gc;
+	while (!isdigit(s))s = gc;
+	while (isdigit(s))x = (x << 1) + (x << 3) + (s ^ 48), s = gc;
+	*w=x;
+}
+void write(int x) {
+	if (x < 0) {
+		x = -x;
+		putchar_unlocked(45);
+	}
+	if (x > 9ll) {
+		write(x / 10);
+	}
+	putchar_unlocked(x % 10 + 48);
+}
+typedef struct {
+	int x, id;
+}node;
+int n, m;
+
 int main() {
-	scanf("%lld", &T);
-	fac[0] = Ifac[0] = Inv[1] = powb2[0] = f[0] = 1;
-	f[1] = 0;
-	for(int i = 2; i < 5000001; ++i) {
-		Inv[i] = Inv[MOD % i] * (MOD - MOD / i) % MOD;
-		f[i] = ((f[i - 1] * (i - 1) << 2ll) + (f[i - 2] << 3ll)) % MOD * Inv[i] % MOD;
-	}
-	for(int i = 1; i < 5000001; ++i) {
-		fac[i] = fac[i - 1] * i % MOD;
-		Ifac[i] = Ifac[i - 1] * Inv[i] % MOD;
-		powb2[i] = (powb2[i - 1] << 1ll) % MOD;
-	}
-	while(T--) {
-		scanf("%lld", &n);
-		for (k = 0; k <= n; ++k) {
-			printf("%lld\n", fac[n] * fac[n] % MOD * powb2[k] % MOD * Ifac[k] % MOD * f[n - k] % MOD);
-		}
-	}
+	read(&n);
+	read(&m);
 }
