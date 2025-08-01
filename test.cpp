@@ -1,57 +1,53 @@
-#include <cstring>
-#include <iostream>
-#include <map>
+#include <algorithm>
+#include <set>
+#include <array>
+#include <stdio.h>
 using namespace std;
-constexpr int MAXN = 2000010;
-long long T, n, pri[MAXN], cur, mu[MAXN], sum_mu[MAXN];
-bool vis[MAXN];
-map<long long, long long> mp_mu;
-
-long long S_mu(long long x) {  // 求mu的前缀和
-	if (x < MAXN) return sum_mu[x];
-	if (mp_mu[x]) return mp_mu[x];  // 如果map中已有该大小的mu值，则可直接返回
-	long long ret = (long long)1;
-	for (long long i = 2, j; i <= x; i = j + 1) {
-		j = x / (x / i);
-		ret -= S_mu(x / i) * (j - i + 1);
-	}
-	return mp_mu[x] = ret;  // 路径压缩，方便下次计算
-}
-
-long long S_phi(long long x) {  // 求phi的前缀和
-	long long ret = (long long)0;
-	long long j;
-	for (long long i = 1; i <= x; i = j + 1) {
-		j = x / (x / i);
-		ret += (S_mu(j) - S_mu(i - 1)) * (x / i) * (x / i);
-	}
-	return (ret - 1) / 2 + 1;
-}
-
-int main() {
-	cin.tie(nullptr)->sync_with_stdio(false);
-	cin >> T;
-	mu[1] = 1;
-	for (int i = 2; i < MAXN; i++) {  // 线性筛预处理mu数组
-		if (!vis[i]) {
-			pri[++cur] = i;
-			mu[i] = -1;
+typedef long long ll;
+int n, m, a[200001];
+ll l[200001], r[200001];
+void get(ll *l) {
+	set<array<ll, 2> > st;
+	for (int i = 1; i <= n; ++i) {
+		l[i] = l[i - 1];
+		array<ll, 2> p({a[i], a[i] + m - 1});
+		auto it = st.upper_bound(p);
+		if (it != st.begin() && prev(it)->at(1) >= p[0]) {
+			it--;
+			l[i] += it->at(1) + 1 - p[0];
+			p = {it->at(0), it->at(1) + m};
+			st.erase(it);
 		}
-		for (int j = 1; j <= cur && i * pri[j] < MAXN; j++) {
-			vis[i * pri[j]] = true;
-			if (i % pri[j])
-				mu[i * pri[j]] = -mu[i];
-			else {
-				mu[i * pri[j]] = 0;
+		while (1) {
+			it = st.upper_bound(p);
+			if (it == st.end() || it->at(0) > p[1]) {
 				break;
 			}
+			l[i] += (it->at(1) - it->at(0) + 1) / m * (p[1] + 1 - it->at(0));
+			p[1] += it->at(1) - it->at(0) + 1;
+			st.erase(it);
 		}
+		st.insert(p);
 	}
-	for (int i = 1; i < MAXN; i++)
-		sum_mu[i] = sum_mu[i - 1] + mu[i];  // 求mu数组前缀和
+}
+void solve() {
+	scanf("%d%d", &n, &m);
+	for (int i = 1; i <= n; ++i) {
+		scanf("%d", &a[i]);
+	}
+	get(l);
+	reverse(a + 1, a + n + 1);
+	get(r);
+	ll ret = 9e18;
+	for (int i = 1; i < n; ++i) {
+		ret = min(ret, l[i] + r[n - i]);
+	}
+	printf("%lld\n", ret);
+}
+int T;
+int main() {
+	scanf("%d", &T);
 	while (T--) {
-		cin >> n;
-		cout << S_phi(n) << ' ' << S_mu(n) << '\n';
+		solve();
 	}
-	return 0;
 }
