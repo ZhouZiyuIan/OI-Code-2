@@ -1,53 +1,52 @@
-#include <algorithm>
-#include <set>
-#include <array>
-#include <stdio.h>
+#pragma GCC optimize (3, "Ofast", "inline")
+#include <iostream>
+#include <vector>
 using namespace std;
-typedef long long ll;
-int n, m, a[200001];
-ll l[200001], r[200001];
-void get(ll *l) {
-	set<array<ll, 2> > st;
-	for (int i = 1; i <= n; ++i) {
-		l[i] = l[i - 1];
-		array<ll, 2> p({a[i], a[i] + m - 1});
-		auto it = st.upper_bound(p);
-		if (it != st.begin() && prev(it)->at(1) >= p[0]) {
-			it--;
-			l[i] += it->at(1) + 1 - p[0];
-			p = {it->at(0), it->at(1) + m};
-			st.erase(it);
-		}
-		while (1) {
-			it = st.upper_bound(p);
-			if (it == st.end() || it->at(0) > p[1]) {
-				break;
-			}
-			l[i] += (it->at(1) - it->at(0) + 1) / m * (p[1] + 1 - it->at(0));
-			p[1] += it->at(1) - it->at(0) + 1;
-			st.erase(it);
-		}
-		st.insert(p);
-	}
+long long p;
+vector<long long> factors;
+long long fpow(long long base, long long exp, long long mod) {
+    long long res = 1;
+    base %= mod;
+    while (exp) {
+        if (exp & 1) {
+            res = res * base % mod;
+        }
+        base = base * base % mod;
+        exp >>= 1;
+    }
+    return res;
 }
-void solve() {
-	scanf("%d%d", &n, &m);
-	for (int i = 1; i <= n; ++i) {
-		scanf("%d", &a[i]);
-	}
-	get(l);
-	reverse(a + 1, a + n + 1);
-	get(r);
-	ll ret = 9e18;
-	for (int i = 1; i < n; ++i) {
-		ret = min(ret, l[i] + r[n - i]);
-	}
-	printf("%lld\n", ret);
+void get(long long n) {
+    for (long long i = 2; i * i <= n; ++i) {
+        if (n % i == 0) {
+            factors.emplace_back(i);
+            while (n % i == 0) {
+                n /= i;
+            }
+        }
+    }
+    if (n > 1) {
+        factors.emplace_back(n);
+    }
 }
-int T;
+bool chk(long long g, long long p) {
+    for (long long q : factors) {
+        if (fpow(g, (p - 1) / q, p) == 1) {
+            return 0;
+        }
+    }
+    return 1;
+}
 int main() {
-	scanf("%d", &T);
-	while (T--) {
-		solve();
-	}
+    ios :: sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+    cin >> p;
+    get(p - 1);
+    for (long long g = 2; g < p; ++g) {
+        if (chk(g, p)) {
+            cout << g << endl;
+            break;
+        }
+    }
 }

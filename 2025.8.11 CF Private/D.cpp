@@ -5,16 +5,13 @@
 #include <vector>
 #include <algorithm>
 using namespace std;
-
 const int P_max = 10000;
-
 struct Node {
     int l, r, mid;
     vector<vector<int>> vl;
     vector<vector<int>> vr;
     Node *left_child, *right_child;
 };
-
 Node* build(int l, int r, vector<int>& p, vector<int>& v) {
     Node *node = new Node();
     node->l = l;
@@ -51,7 +48,6 @@ Node* build(int l, int r, vector<int>& p, vector<int>& v) {
             }
         }
     }
-
     if (right_total > 0) {
         node->vr.resize(right_total, vector<int>(P_max + 1, 0));
         int pos0 = node->mid + 1;
@@ -83,17 +79,16 @@ Node* build(int l, int r, vector<int>& p, vector<int>& v) {
             }
         }
     }
-
     if (l < r) {
         node->left_child = build(l, node->mid, p, v);
         node->right_child = build(node->mid + 1, r, p, v);
-    } else {
+    }
+    else {
         node->left_child = nullptr;
         node->right_child = nullptr;
     }
     return node;
 }
-
 int query(Node* node, int L, int R, int P) {
     if (L > R) return 0;
     if (node->l == node->r) {
@@ -127,7 +122,6 @@ int query(Node* node, int L, int R, int P) {
     }
     return 0;
 }
-
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(0);
