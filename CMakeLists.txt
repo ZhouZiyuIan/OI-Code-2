@@ -41,3 +41,6 @@ add_executable(OI_Code_New_
         "2025.7.10 Thursday oiClass/C. Numbers Choosing.cpp"
         Manacher/Disjoint_Palindrome_Strings.cpp
 )
+add_executable(YBT1121_Differnt "YBT1121_Differnt.cpp")
+add_executable(Choose_Hotel "Choose_Hotel.cpp")
+add_executable(Biorhythms "Biorhythms.cpp")
