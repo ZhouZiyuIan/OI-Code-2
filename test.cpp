@@ -1,107 +1,108 @@
-#include <stdio.h>
-typedef long long ll;
-int n, q, m, a[100001], op, x, y, k;
-ll mlt[400001], lzt[400001], seg[400001];
-void pushup(const int x) {
-	seg[x] = (seg[x << 1] + seg[x << 1 | 1]) % m;
+#include <bits/stdc++.h>
+using namespace std;
+
+const int MAXN = 2005;
+const long long INF = 1e18;
+
+struct Point {
+	int x, y, h;
+} points[MAXN];
+
+vector<vector<int>> lines;
+int n, m;
+
+// Calculate Euclidean distance between two points (rounded up)
+int dist(int i, int j) {
+	long long dx = points[i].x - points[j].x;
+	long long dy = points[i].y - points[j].y;
+	return (int)ceil(sqrt(dx * dx + dy * dy));
 }
-void pushdown(const int i, const int s, const int t) {
-	const int l = (i << 1), r = (i << 1) | 1, mid = (s + t) >> 1;
-	if (mlt[i] != 1) {
-		mlt[l] = (mlt[l] * mlt[i]) % m;
-		mlt[r] = (mlt[r] * mlt[i]) % m;
-		lzt[l] = (lzt[l] * mlt[i]) % m;
-		lzt[r] = (lzt[r] * mlt[i]) % m;
-		seg[l] = (seg[l] * mlt[i]) % m;
-		seg[r] = (seg[r] * mlt[i]) % m;
-		mlt[i] = 1;
+
+// State for Dijkstra's algorithm
+struct State {
+	int node;
+	long long happiness;
+	bool operator<(const State& other) const {
+		return happiness < other.happiness;
 	}
-	if (lzt[i]) {
-		seg[l] = (seg[l] + lzt[i] * (mid - s + 1)) % m;
-		seg[r] = (seg[r] + lzt[i] * (t - mid)) % m;
-		lzt[l] = (lzt[l] + lzt[i]) % m;
-		lzt[r] = (lzt[r] + lzt[i]) % m;
-		lzt[i] = 0;
+};
+
+// Modified Dijkstra's algorithm to find maximum happiness
+vector<long long> findMaxHappiness(int start) {
+	vector<long long> happiness(n + 1, -INF);
+	priority_queue<State> pq;
+	
+	// Start with initial node's happiness
+	happiness[start] = points[start].h;
+	pq.push({start, happiness[start]});
+	
+	while (!pq.empty()) {
+		State curr = pq.top();
+		pq.pop();
+		
+		if (curr.happiness < happiness[curr.node]) continue;
+		
+		// Try each metro line
+		for (const auto& line : lines) {
+			for (int i = 0; i < line.size(); i++) {
+				if (line[i] != curr.node) continue;
+				
+				// Try all possible destinations on this line after current station
+				long long currHappiness = curr.happiness;
+				for (int j = i + 1; j < line.size(); j++) {
+					int next = line[j];
+					// Calculate total distance cost for this segment
+					long long distCost = 0;
+					for (int k = i; k < j; k++) {
+						distCost += dist(line[k], line[k + 1]);
+					}
+					
+					// Calculate new happiness (including station happiness if we stop there)
+					long long newHappiness = currHappiness - distCost + points[next].h;
+					
+					if (newHappiness > happiness[next]) {
+						happiness[next] = newHappiness;
+						pq.push({next, newHappiness});
+					}
+				}
+			}
+		}
 	}
+	
+	return happiness;
 }
-void build(const int x, const int l, const int r) {
-	mlt[x] = 1;
-	lzt[x] = 0;
-	if (l == r) {
-		seg[x] = a[l] % m;
-		return;
-	}
-	int mid = (l + r) >> 1;
-	build(x << 1, l, mid);
-	build(x << 1 | 1, mid + 1, r);
-	pushup(x);
-}
-void mul(const int x, const int l, const int r, const int gl, const int gr, const int val) {
-	if (gl <= l && r <= gr) {
-		mlt[x] = (mlt[x] * val) % m;
-		seg[x] = (seg[x] * val) % m;
-		lzt[x] = (lzt[x] * val) % m;
-		return;
-	}
-	pushdown(x, l, r);
-	const int mid = (l + ((r - l) >> 1));
-	if (mid >= gl) {
-		mul(x << 1, l, mid, gl, gr, val);
-	}
-	if (mid + 1 <= gr) {
-		mul(x << 1 | 1, mid + 1, r, gl, gr, val);
-	}
-	pushup(x);
-}
-void add(const int x, const int l, const int r, const int gl, const int gr, const int val) {
-	if (gl <= l && r <= gr) {
-		seg[x] = (seg[x] + (ll) val * (r - l + 1)) % m;
-		lzt[x] = (lzt[x] + val) % m;
-		return;
-	}
-	pushdown(x, l, r);
-	const int mid = (l + ((r - l) >> 1));
-	if (mid >= gl) {
-		add(x << 1, l, mid, gl, gr, val);
-	}
-	if (mid + 1 <= gr) {
-		add(x << 1 | 1, mid + 1, r, gl, gr, val);
-	}
-	pushup(x);
-}
-ll que(const int x, const int l, const int r, const int gl, const int gr) {
-	if (gl <= l && r <= gr) {
-		return seg[x] % m;
-	}
-	pushdown(x, l, r);
-	ll tot = 0;
-	const int mid = (l + ((r - l) >> 1));
-	if (mid >= gl) {
-		tot += que(x << 1, l, mid, gl, gr);
-	}
-	if (mid + 1 <= gr) {
-		tot += que(x << 1 | 1, mid + 1, r, gl, gr);
-	}
-	return tot % m;
-}
+
 int main() {
-	scanf("%d%d%d", &n, &q, &m);
-	for (int i = 1; i <= n; ++i) {
-		scanf("%d", &a[i]);
+	freopen("metro.in", "r", stdin);
+	freopen("metro.out", "w", stdout);
+	
+	cin >> n >> m;
+	
+	// Read points
+	for (int i = 1; i <= n; i++) {
+		cin >> points[i].x >> points[i].y >> points[i].h;
 	}
-	build(1, 1, n);
-	while (q--) {
-		scanf("%d%d%d", &op, &x, &y);
-		if (op == 1) {
-			scanf("%d", &k);
-			mul(1, 1, n, x, y, k);
+	
+	// Read metro lines
+	for (int i = 0; i < m; i++) {
+		int p;
+		cin >> p;
+		vector<int> line(p);
+		for (int j = 0; j < p; j++) {
+			cin >> line[j];
 		}
-		else if (op == 2) {
-			scanf("%d", &k);
-			add(1, 1, n, x, y, k);
-		}
-		else {
-			printf("%lld\n", que(1, 1, n, x, y));
-		}
+		lines.push_back(line);
 	}
+	
+	// Calculate maximum happiness for each pair of stations
+	for (int i = 1; i <= n; i++) {
+		vector<long long> maxHappiness = findMaxHappiness(i);
+		for (int j = 1; j <= n; j++) {
+			if (j > 1) cout << " ";
+			cout << maxHappiness[j];
+		}
+		cout << "\n";
+	}
+	
+	return 0;
 }
