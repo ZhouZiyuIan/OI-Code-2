@@ -2,5 +2,6 @@
     "files.associations": {
         "unordered_map": "cpp",
         "random": "cpp"
-    }
+    },
+    "markdown.validate.enabled": true
 }
