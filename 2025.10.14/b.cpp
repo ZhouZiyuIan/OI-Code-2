@@ -18,8 +18,8 @@ struct Mat{
 Mat dp[2007][2007],pw[2007];
 string s;
 signed main(){
-	freopen("b.in" ,"r",stdin );
-	freopen("b.out","w",stdout);
+	//freopen("b.in" ,"r",stdin );
+	//freopen("b.out","w",stdout);
 	cin>>n>>k;
 	cin>>s;
 	s=" "+s;

@@ -31,7 +31,7 @@ void write(int x) {
 		putchar(str[i]);
 	}
 }
-int T, n, ch, f, sum, ans;
+int T, n, ch, f, sum, ans, flag = 1;
 char a[2000001];
 int main() {
 	freopen("a.in", "r", stdin);
@@ -41,7 +41,15 @@ int main() {
 		sum = n = 0;
 		ans = f = 1;
 		while (ch = getchar(), ch == 48 || ch == 49) {
+			if (ch != 1) {
+				flag = 0;
+			}
 			a[n++] = (char) ch;
+		}
+		if (flag) {
+			write(1);
+			putchar(10);
+			continue;
 		}
 		for (int i = 0; i < n - 1; ++i) {
 			sum += f;
