@@ -104,6 +104,6 @@ int main() {
 			++s;
 		}
 	}
-	write((nw == n ? dis : -1) - 1);
+	write((nw == n ? dis : 0) - 1);
 	putchar(10);
 }
