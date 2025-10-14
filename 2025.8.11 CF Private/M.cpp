@@ -11,7 +11,7 @@ void init() {
 	}
 	ans = 0;
 }
-long long qpow(long long a, long long b) {
+long long fstpow(long long a, long long b) {
 	long long res = 1;
 	while (b) {
 		if (b & 1) {
@@ -26,7 +26,7 @@ long long C(long long a, long long b) {
 	if (a < b) {
 		return 0;
 	}
-	return fac[a] * qpow(fac[b], MOD - 2) % MOD * qpow(fac[a - b], MOD - 2) % MOD;
+	return fac[a] * fstpow(fac[b], MOD - 2) % MOD * fstpow(fac[a - b], MOD - 2) % MOD;
 }
 int main() {
 	scanf("%lld", &T);

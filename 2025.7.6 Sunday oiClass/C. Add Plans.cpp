@@ -6,7 +6,7 @@
 #endif
 #define ll long long
 const int MOD=998244353;
-ll qpow(ll a,ll b){
+ll fstpow(ll a,ll b){
 	a%=MOD;
 	long long res=1;
 	while(b>0){
@@ -30,7 +30,7 @@ int main(){
 		s=getchar_unlocked();
 	}
 	for(int i=0;i<lenn;++i){
-		ans=((ans+(ans<<1)+(ans<<3))%MOD+qpow(2,i)*n[i])%MOD;
+		ans=((ans+(ans<<1)+(ans<<3))%MOD+fstpow(2,i)*n[i])%MOD;
 		sum=(((sum<<1)+(sum<<3))+n[i])%MOD;
 	}
 	printf("%lld\n",((ans<<1)-sum+MOD)%MOD);
