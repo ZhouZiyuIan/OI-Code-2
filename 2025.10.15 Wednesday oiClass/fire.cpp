@@ -1,35 +1,79 @@
-#include<bits/stdc++.h>
-using namespace std;
-#define mod 1000000007
-int n,k,s[200001],zr[200001],ans;
-int qp(int a,int b)
-{
-	int res=1;
-	for(;b;b>>=1)
-	{
-		if(b&1)res=1ll*res*a%mod;
-		a=1ll*a*a%mod;
+#include <ctype.h>
+#include <stdio.h>
+#define FileIO(str) freopen(str".in", "r", stdin); freopen(str".out", "w", stdout)
+#define MOD 1000000007
+void read(long long *w) {
+	long long f = 1, x = 0, s = getchar();
+	while (!isdigit(s)) {
+		if (s == 45) {
+			f = -f;
+		}
+		s = getchar();
+	}
+	do {
+		x = (x << 1) + (x << 3) + (s ^ 48);
+		s = getchar();
+	}
+	while (isdigit(s));
+	x *= f;
+	*w = x;
+}
+void write(long long x) {
+	long long len_s = 0;
+	int str[10];
+	while (x > 9) {
+		// ReSharper disable once CppCStyleCast
+		str[len_s++] = (int)(x % 10 ^ 48);
+		x /= 10;
+	}
+	// ReSharper disable once CppCStyleCast
+	str[len_s] = (int)(x % 10 ^ 48);
+	for (long long i = len_s; i >= 0; --i) {
+		putchar(str[i]);
+	}
+}
+long long min(const long long a, const long long b) {
+	return a < b ? a : b;
+}
+long long max(const long long a, const long long b) {
+	return a > b ? a : b;
+}
+long long fstpow(long long a, long long b) {
+	a %= MOD;
+	long long res = 1;
+	while (b) {
+		if (b & 1) {
+			// ReSharper disable CppFunctionalStyleCast
+			res = 1ll * res * a % MOD;
+			// ReSharper restore CppFunctionalStyleCast
+		}
+		a = a * a % MOD;
+		b >>= 1;
 	}
 	return res;
 }
-signed main()
-{
-	// freopen("fire.in","r",stdin);
-	// freopen("fire.out","w",stdout);
-	scanf("%d%d",&n,&k);
-	s[0]=1;
-	for(int i=1;i<=n;i++)
-	{
-		scanf("%d",&s[i]);
-		zr[i]=zr[i-1];
-		if(s[i]==100)
-		{
-			++zr[i];
-			s[i]=s[i-1];
+long long n, k, a[200001], burn[200001], ans;
+int main() {
+	#ifndef __WIN32
+	FileIO("fire");
+	#endif
+	read(&n);
+	read(&k);
+	a[0] = 1;
+	for (long long i = 1; i <= n; ++i) {
+		read(&a[i]);
+		burn[i] = burn[i - 1];
+		if (a[i] == 100) {
+			++burn[i];
+			a[i] = a[i - 1];
 		}
-		s[i]=570000004ll*(100-s[i])%mod*s[i-1]%mod;
+		// ReSharper disable CppFunctionalStyleCast
+		a[i] = 570000004ll * (100 - a[i]) % MOD * a[i - 1] % MOD;
+		// ReSharper restore CppFunctionalStyleCast
 	}
-	for(int i=1;i<=n;i++)(ans+=1ll-1ll*s[min(i+k,n)]*qp(s[max(i-k-1,0)],mod-2)%mod*qp(0,zr[min(i+k,n)]-zr[max(i-k-1,0)])%mod+mod)%=mod;
-	printf("%d\n",ans);
-	return 0;
+	for (long long i = 1; i <= n; ++i) {
+		ans += 1ll - 1ll * a[min(i + k, n)] * fstpow(a[max(i - k - 1, 0)],MOD - 2) % MOD * fstpow(0, burn[min(i + k, n)] - burn[max(i - k - 1, 0)]) % MOD + MOD;
+		ans %= MOD;
+	}
+	write(ans);
 }

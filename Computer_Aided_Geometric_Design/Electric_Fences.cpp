@@ -2,8 +2,8 @@
 // Created by 118 on 25-7-29.
 //
 #include <stdio.h>
-int abs(int a) {
-	return a < 0 ? -a : a;
+int abs(int _X) {
+	return _X < 0 ? -_X : _X;
 }
 int gcd(int a, int b) {
 	return b == 0 ? a : gcd(b, a % b);
